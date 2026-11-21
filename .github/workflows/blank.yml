@@ -19,11 +19,11 @@ jobs:
 
       - name: 下载并安装 payload-dumper-go
         run: |
-          LATEST_URL=$(curl -s https://github.com | grep "browser_download_url.*linux_amd64.tar.gz" | cut -d '"' -f 4)
-          wget -q "$LATEST_URL" -O payload-dumper-go.tar.gz
-          tar -xzf payload-dumper-go.tar.gz
-          chmod +x payload-dumper-go
-          sudo mv payload-dumper-go /usr/local/bin/
+          LATEST_URL='https://github.com/xishang0128/payload-dumper-go/releases/download/v0.1.6/payload-dumper-linux-amd64-v3.tar.gz'
+          wget -q "$LATEST_URL" -O payload-dumper-linux-amd64-v3.tar.gz
+          tar -xzf payload-dumper-linux-amd64-v3.tar.gz
+          chmod +x payload-dumper-linux-amd64-v3
+          sudo mv payload-dumper-linux-amd64-v3 /usr/local/bin/
 
       - name: 下载 OnePlus ROM 包
         run: |
