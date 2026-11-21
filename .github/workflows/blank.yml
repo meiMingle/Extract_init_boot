@@ -1,0 +1,48 @@
+name: Extract init_boot.img from OnePlus ROM
+
+on:
+  workflow_dispatch:
+    inputs:
+      rom_url:
+        description: 'OnePlus ROM 下载直链'
+        required: true
+        default: 'https://gauss-opexcostmanual-cn.allawnfs.com/remove-01f9640d3ee4b6da39f6081e0284a07c/component-ota/25/06/12/80d763eee95c49a8b5f4d048e1706e89.zip'
+      partition_name:
+        description: '需要提取的分区名称 (例如 init_boot 或 boot)'
+        required: true
+        default: 'init_boot'
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 清理磁盘空间 (防止大型 ROM 包导致空间不足)
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost /usr/local/lib/android
+          df -h
+
+      - name: 下载并安装 payload-dumper-go
+        run: |
+          LATEST_URL=$(curl -s https://github.com | grep "browser_download_url.*linux_amd64.tar.gz" | cut -d '"' -f 4)
+          wget -q "$LATEST_URL" -O payload-dumper-go.tar.gz
+          tar -xzf payload-dumper-go.tar.gz
+          chmod +x payload-dumper-go
+          sudo mv payload-dumper-go /usr/local/bin/
+
+      - name: 下载 OnePlus ROM 包
+        run: |
+          aria2c -x 16 -s 16 -k 1M "${{ github.event.inputs.rom_url }}" -o rom.zip || wget -O rom.zip "${{ github.event.inputs.rom_url }}"
+
+      - name: 提取 init_boot.img
+        run: |
+          mkdir -p output
+          payload-dumper-go -p "${{ github.event.inputs.partition_name }}" -o output rom.zip
+          ls -lh output/
+
+      - name: 上传提取的镜像文件
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.event.inputs.partition_name }}-img
+          path: output/${{ github.event.inputs.partition_name }}.img
+          retention-days: 7
