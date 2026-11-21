@@ -32,7 +32,7 @@ jobs:
       - name: 提取 init_boot.img
         run: |
           mkdir -p output
-          payload-dumper-go -p "${{ env.TARGET_NAME }}" -o output rom.zip
+          payload-dumper-linux-amd64-v3 -p "${{ env.TARGET_NAME }}" -o output rom.zip
           ls -lh output/
 
       - name: 上传提取的镜像文件
