@@ -1,16 +1,11 @@
 name: Extract init_boot.img from OnePlus ROM
 
 on:
-  workflow_dispatch:
-    inputs:
-      rom_url:
-        description: 'OnePlus ROM 下载直链'
-        required: true
-        default: 'https://gauss-opexcostmanual-cn.allawnfs.com/remove-01f9640d3ee4b6da39f6081e0284a07c/component-ota/25/06/12/80d763eee95c49a8b5f4d048e1706e89.zip'
-      partition_name:
-        description: '需要提取的分区名称 (例如 init_boot 或 boot)'
-        required: true
-        default: 'init_boot'
+  watch:
+    types: [started]
+env:
+  FIRMWARE_LINK: https://gauss-opexcostmanual-cn.allawnfs.com/remove-01f9640d3ee4b6da39f6081e0284a07c/component-ota/25/06/12/80d763eee95c49a8b5f4d048e1706e89.zip
+  TARGET_NAME: init_boot
 
 jobs:
   extract:
@@ -32,17 +27,17 @@ jobs:
 
       - name: 下载 OnePlus ROM 包
         run: |
-          aria2c -x 16 -s 16 -k 1M "${{ github.event.inputs.rom_url }}" -o rom.zip || wget -O rom.zip "${{ github.event.inputs.rom_url }}"
+          aria2c -x 16 -s 16 -k 1M "${{ env.FIRMWARE_LINK }}" -o rom.zip || wget -O rom.zip "${{ env.FIRMWARE_LINK }}"
 
       - name: 提取 init_boot.img
         run: |
           mkdir -p output
-          payload-dumper-go -p "${{ github.event.inputs.partition_name }}" -o output rom.zip
+          payload-dumper-go -p "${{ env.TARGET_NAME }}" -o output rom.zip
           ls -lh output/
 
       - name: 上传提取的镜像文件
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.event.inputs.partition_name }}-img
-          path: output/${{ github.event.inputs.partition_name }}.img
+          name: ${{ env.TARGET_NAME }}-img
+          path: output/${{ env.TARGET_NAME }}.img
           retention-days: 7
