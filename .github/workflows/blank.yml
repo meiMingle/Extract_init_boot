@@ -28,7 +28,7 @@ jobs:
       - name: 提取 init_boot.img
         run: |
           payload-dumper-linux-amd64-v3 extract "${{ env.FIRMWARE_LINK }}" -p boot
-          ls -lh 
+          ls -lh ./output
 
       - name: 上传提取的镜像文件
         uses: actions/upload-artifact@v4
