@@ -25,14 +25,10 @@ jobs:
           chmod +x payload-dumper-linux-amd64-v3
           sudo mv payload-dumper-linux-amd64-v3 /usr/local/bin/
 
-      - name: 下载 OnePlus ROM 包
-        run: |
-          aria2c -x 16 -s 16 -k 1M "${{ env.FIRMWARE_LINK }}" -o rom.zip || wget -O rom.zip "${{ env.FIRMWARE_LINK }}"
-
       - name: 提取 init_boot.img
         run: |
           mkdir -p output
-          payload-dumper-linux-amd64-v3 extract rom.zip -p boot
+          payload-dumper-linux-amd64-v3 extract "${{ env.FIRMWARE_LINK }}" -p boot
           ls -lh output/
 
       - name: 上传提取的镜像文件
