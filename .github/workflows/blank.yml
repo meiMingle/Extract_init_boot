@@ -27,13 +27,12 @@ jobs:
 
       - name: 提取 init_boot.img
         run: |
-          mkdir -p output
           payload-dumper-linux-amd64-v3 extract "${{ env.FIRMWARE_LINK }}" -p boot
-          ls -lh output/
+          ls -lh 
 
       - name: 上传提取的镜像文件
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.TARGET_NAME }}-img
-          path: output/${{ env.TARGET_NAME }}.img
+          path: ${{ env.TARGET_NAME }}.img
           retention-days: 7
